@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>MohanChat</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
+</head>
+
+<body>
+
+    <div class="chat-container">
+
+        <div class="chat-header">
+            💬 Welcome {{ username }}
+        </div>
+
+        <div class="messages" id="messages"></div>
+
+        <div class="input-area">
+            <input type="text" id="messageInput" placeholder="Type a message..." autocomplete="off">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+
+    </div>
+
+    <script>
+        var socket = io();
+
+        function sendMessage() {
+            var input = document.getElementById("messageInput");
+            var message = input.value.trim();
+
+            if (message !== "") {
+                socket.send("{{ username }}: " + message);
+                input.value = "";
+            }
+        }
+
+        socket.on("message", function (msg) {
+            var messages = document.getElementById("messages");
+
+            var div = document.createElement("div");
+            div.classList.add("message");
+
+            if (msg.startsWith("{{ username }}:")) {
+                div.classList.add("my-message");
+            } else {
+                div.classList.add("other-message");
+            }
+
+            div.innerText = msg;
+            messages.appendChild(div);
+
+            messages.scrollTop = messages.scrollHeight;
+        });
+    </script>
+
+</body>
+
+</html>
